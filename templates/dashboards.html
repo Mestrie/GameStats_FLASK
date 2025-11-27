@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboards de Análise{% endblock %}
+
+{% block content %}
+    <h1>Dashboards Interativos</h1>
+    <p>Análise de dados em tempo real (visualizadores) e simulação de dados de avaliação do usuário.</p>
+
+    <div class="dashboard-grid">
+        <div class="chart-card">
+            <h2>Média de Avaliação Simulada</h2>
+            <canvas id="graficoAvaliacoes"></canvas>
+        </div>
+        
+        <div class="chart-card">
+            <h2>Visualizadores Atuais (Twitch API)</h2>
+            <canvas id="graficoVisualizadores"></canvas> 
+        </div>
+        
+        </div>
+    
+    {% endblock %}

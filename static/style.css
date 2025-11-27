@@ -1,0 +1,170 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background-color: #4b367c; /* Cor da Twitch */
+    color: white;
+    padding: 10px 0;
+}
+
+header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header nav .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+header nav ul li a:hover {
+    background-color: #6a4fa4;
+}
+
+.btn-login {
+    background-color: #ff9900;
+    font-weight: bold;
+}
+.btn-login:hover {
+    background-color: #e68a00 !important;
+}
+
+main {
+    padding: 40px 0;
+    min-height: 80vh; /* Garante que o footer fique embaixo */
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+}
+
+/* Estilos de Formulário */
+.form-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 40px auto;
+}
+
+/* Estilos para o Dashboard */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+.chart-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+/* --- Estilos para a Listagem de Jogos (Cards) --- */
+
+.lista-jogos-grid {
+    /* Define o layout como Grade (Grid) */
+    display: grid;
+    /* 3 colunas, ajustando o tamanho automaticamente */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.card-jogo {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Garante que a imagem se ajuste ao raio da borda */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-jogo:hover {
+    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-jogo a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.card-jogo img {
+    width: 100%;
+    /* Define uma altura fixa para que todos os cards fiquem uniformes */
+    height: 350px; 
+    object-fit: cover; /* Garante que a imagem preencha a área sem distorcer */
+}
+
+.info-jogo {
+    padding: 15px;
+    text-align: center;
+}
+
+.info-jogo h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: #4b367c;
+}
+/* --- Estilos para a Paginação --- */
+.paginacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 40px 0;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+}
+
+.btn-pagina {
+    background-color: #4b367c;
+    color: white !important; /* Cor branca para o texto do botão */
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-pagina:hover {
+    background-color: #6a4fa4;
+}
+
+/* Garante que o span vazio no lugar do botão "Anterior" mantenha o layout */
+.paginacao span {
+    width: 200px; /* Ajuste o tamanho conforme o botão */
+}
