@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo de Jogos (Página {{ pagina_atual }}){% endblock %}
+
+{% block content %}
+    <h1>Catálogo de Jogos (IGDB)</h1>
+    <p>Exibindo jogos de <strong>{{ pagina_atual }}</strong>. Clique em um jogo para ver sua análise.</p>
+    <!-- Formulário de Pesquisa -->
+    <div class="mb-8 p-4 bg-gray-50 rounded-lg shadow-md">
+        <form action="{{ url_for('listagem') }}" method="GET" class="flex flex-col sm:flex-row gap-4 items-center">
+            <label for="pesquisa" class="font-semibold text-lg text-gray-700 whitespace-nowrap">Pesquisar Jogo:</label>
+            <input 
+                type="text" 
+                id="pesquisa" 
+                name="pesquisa" 
+                placeholder="Digite o nome do jogo..." 
+                value="{{ termo_pesquisa or '' }}" 
+                class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm w-full sm:w-auto"
+            >
+            <input type="hidden" name="pagina" value="1">
+            <button 
+                type="submit" 
+                class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-150 transform hover:scale-[1.01] w-full sm:w-auto"
+            >
+                Buscar
+            </button>
+            {% if termo_pesquisa %}
+                <a href="{{ url_for('listagem') }}" class="text-red-500 hover:text-red-700 font-medium whitespace-nowrap">Limpar Pesquisa</a>
+            {% endif %}
+        </form>
+    </div>
+<!-- Fim do Formulário de Pesquisa -->
+
+<!-- Certifique-se de que a listagem de jogos (div grid) começa logo após este bloco -->
+    <div class="lista-jogos-grid">
+        {% for jogo in jogos %}
+        <div class="card-jogo">
+            <a href="{{ url_for('dashboards_detalhes', game_id=jogo.id) }}">
+                <img src="{{ jogo.imagem_url }}" alt="Capa do Jogo {{ jogo.titulo }}">
+                <div class="info-jogo">
+                    <h3>{{ jogo.titulo }}</h3>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Controles de Paginação -->
+    <div class="flex justify-center items-center mt-10 space-x-6">
+        {% if pagina_atual > 1 %}
+            <a href="{{ url_for('listagem', pagina=pagina_atual - 1, pesquisa=termo_pesquisa) }}" class="px-6 py-3 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 transition duration-150">
+                <span class="text-xl">&larr;</span> Página Anterior
+            </a>
+        {% else %}
+            <span class="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
+                <span class="text-xl">&larr;</span> Página Anterior
+            </span>
+        {% endif %}
+
+        <span class="text-xl font-bold text-blue-600">Página {{ pagina_atual }}</span>
+
+        {% if proxima_pagina_existe %}
+            <a href="{{ url_for('listagem', pagina=pagina_atual + 1, pesquisa=termo_pesquisa) }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150">
+                Próxima Página <span class="text-xl">&rarr;</span>
+            </a>
+        {% else %}
+            <span class="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
+                Próxima Página <span class="text-xl">&rarr;</span>
+            </span>
+        {% endif %}
+    </div>
+    <!-- Fim dos Controles de Paginação -->
+    {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Início - Stream Insights{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <h1>Bem-vindo ao Stream Insights</h1>
+        <p>Sua plataforma de análise de dados em tempo real para jogos do catálogo IGDB e suas streams ativas na Twitch.</p>
+        
+        <!-- CORRIGIDO: O link agora aponta para a listagem/catálogo -->
+        <p>Descubra quais streams e jogos estão dominando a audiência. Acesse o <a href="{{ url_for('listagem') }}">Catálogo de Jogos</a> e visualize os Dashboards.</p>
+        
+    </section>
+
+    <section class="features">
+        <h2>O que oferecemos</h2>
+        <div class="feature-item">
+            <h3>Catálogo Detalhado</h3>
+            <p>Explore milhares de jogos da base de dados IGDB, com informações ricas sobre capas, títulos e IDs.</p>
+        </div>
+        <div class="feature-item">
+            <h3>Análise de Streams</h3>
+            <p>Veja em tempo real o número de espectadores e informações das streams mais populares de cada jogo na Twitch.</p>
+        </div>
+        <div class="feature-item">
+            <h3>Dashboards Dinâmicos</h3>
+            <p>Dashboards específicos gerados na hora para cada jogo, permitindo uma análise focada e precisa.</p>
+        </div>
+    </section>
+{% endblock %}
