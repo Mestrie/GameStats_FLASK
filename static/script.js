@@ -4,16 +4,14 @@ async function carregarDashboard() {
     const gameId = window.gameId;
     const gameName = window.gameName;
 
-    // Garante que temos um ID válido para a requisição.
-    // O teste `gameId === '{{ game_id }}'` verifica se o Flask falhou em injetar o valor.
-    if (!gameId || gameId === '{{ game_id }}') {
-        console.error('Erro: gameId não foi definido corretamente pelo Jinja.');
+    // Verificação CORRIGIDA: Apenas checa se a variável é nula, indefinida ou a string "None"
+    if (!gameId || typeof gameId === 'undefined' || gameId === 'None') {
+        console.error('Erro: gameId não foi definido corretamente no template HTML.');
         return;
     }
 
     try {
-        // 1. FAZER A REQUISIÇÃO (FETCH) AO BACKEND PYTHON
-        // Usa a variável gameId na URL para buscar dados do jogo específico.
+        // Agora o FETCH será executado corretamente:
         const apiUrl = `/api/analises/${gameId}`;
         const response = await fetch(apiUrl);
         
