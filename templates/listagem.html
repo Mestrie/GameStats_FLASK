@@ -7,7 +7,7 @@
     <p>Exibindo jogos de <strong>{{ pagina_atual }}</strong>. Clique em um jogo para ver sua análise.</p>
     <!-- Formulário de Pesquisa -->
     <div class="mb-8 p-4 bg-gray-50 rounded-lg shadow-md">
-        <form action="{{ url_for('listagem') }}" method="GET" class="flex flex-col sm:flex-row gap-4 items-center">
+        <form action="{{ url_for('listagem') }}" method="GET" id="search-form" class="flex flex-col sm:flex-row gap-4 items-center">
             <label for="pesquisa" class="font-semibold text-lg text-gray-700 whitespace-nowrap">Pesquisar Jogo:</label>
             <input 
                 type="text" 
@@ -30,6 +30,7 @@
         </form>
     </div>
 <!-- Fim do Formulário de Pesquisa -->
+ <script src="{{ url_for('static', filename='autocomplete.js') }}"></script>
 
 <!-- Certifique-se de que a listagem de jogos (div grid) começa logo após este bloco -->
     <div class="lista-jogos-grid">
