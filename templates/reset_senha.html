@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Reset de senha{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>Nova senha</h2>
+    <form method="POST">
+        <label for="password">Nova senha:</label>
+        <input type="password" name="password" id="password" required>
+        <button type="submit">Atualizar senha</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Esqueci a senha{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>Esqueci minha senha</h2>
+    <form method="POST">
+        <label for="email">Digite seu email:</label>
+        <input type="email" name="email" id="email" required>
+        <button type="submit">Enviar link de reset</button>
+    </form>
+</div>
+{% endblock %}

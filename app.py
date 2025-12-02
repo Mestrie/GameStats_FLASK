@@ -4,6 +4,21 @@ import random
 import time
 import os
 from dotenv import load_dotenv
+from itsdangerous import URLSafeTimedSerializer
+from flask import current_app
+
+#Funções para geração e verificação de tokens de reset de senha
+def gerar_token_reset(user_id, expires_sec=3600):
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    return s.dumps(user_id, salt='reset-senha-salt')
+
+def verificar_token_reset(token, expires_sec=3600):
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        user_id = s.loads(token, salt='reset-senha-salt', max_age=expires_sec)
+    except:
+        return None
+    return user_id
 
 # 🔑 IMPORTAÇÕES ESSENCIAIS DO FLASK-LOGIN
 from flask_login import current_user, login_user, logout_user, login_required 
@@ -119,6 +134,38 @@ def logout():
     logout_user()
     flash('Você foi desconectado.', 'info')
     return redirect(url_for('index'))
+
+@app.route('/esqueci_senha', methods=['GET', 'POST'])
+def esqueci_senha():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = gerar_token_reset(user.id)
+            link_reset = url_for('reset_senha', token=token, _external=True)
+            # Aqui você envia o email com link_reset
+            print("Link de reset (teste):", link_reset)
+        flash('Se o email existir no sistema, você receberá um link para reset de senha.', 'info')
+    return render_template('esqueci_senha.html')
+
+@app.route('/reset_senha/<token>', methods=['GET', 'POST'])
+def reset_senha(token):
+    user_id = verificar_token_reset(token)
+    if not user_id:
+        flash('O link de reset é inválido ou expirou.', 'danger')
+        return redirect(url_for('login'))
+
+    user = User.query.get(user_id)
+    if request.method == 'POST':
+        nova_senha = request.form.get('password')
+        hashed_password = bcrypt.generate_password_hash(nova_senha).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        flash('Sua senha foi atualizada com sucesso!', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('reset_senha.html')
+
 
 @app.route('/listagem')
 @login_required #
