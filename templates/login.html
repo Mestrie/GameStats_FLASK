@@ -1,20 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login - Stream Insights{% endblock %}
 
 {% block content %}
-    <div class="form-box">
-        <h2>Entrar no Sistema</h2>
-        <form method="POST" action="{{ url_for('login') }}">
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" required>
 
-            
-            <label for="password">Senha:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <button type="submit" style="margin-top: 15px;">Acessar</button>
-        </form>
-        <p style="margin-top: 20px;">Não tem conta? <a href="{{ url_for('cadastro') }}">Cadastre-se aqui</a>.</p>
-    </div>
+<div class="form-box">
+
+    <h2 style="text-align:center; color:#4b367c;">Login</h2>
+
+    <!-- Renderiza mensagens flash -->
+    {% for msg in get_flashed_messages(with_categories=true) %}
+        <div class="flash {{ msg[0] }}">{{ msg[1] }}</div>
+    {% endfor %}
+
+    <form method="POST">
+        <label for="email">E-mail:</label>
+        <input type="email" name="email" required class="input-field">
+
+        <label for="password">Senha:</label>
+        <input type="password" name="password" required class="input-field">
+
+        <button type="submit" class="btn-primary" style="width:100%;">Entrar</button>
+    </form>
+
+    <p style="text-align:center; margin-top:15px;">
+        Não tem conta? <a href="{{ url_for('cadastro') }}">Cadastrar</a>
+    </p>
+</div>
+
 {% endblock %}

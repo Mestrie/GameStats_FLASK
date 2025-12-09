@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
+from datetime import timedelta
 
 #Funções para geração e verificação de tokens de reset de senha
 def gerar_token_reset(user_id, expires_sec=3600):
@@ -50,6 +51,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 bcrypt.init_app(app)
 login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
+login_manager.session_protection = "strong"  # Melhorar proteção da sessão
+login_manager.remember_cookie_duration = timedelta(minutes=30)  # Expira a sessão depois de 30 minutos
+
+
 
 # ----------------------------------------------------
 # 2. IMPORTAÇÃO E ATRIBUIÇÃO CRUCIAL DO USER_LOADER
@@ -75,7 +82,7 @@ def login():
     # Se o usuário já estiver logado, redireciona
     if current_user.is_authenticated:
         flash('Você já está logado!', 'info')
-        return redirect(url_for('listagem'))
+        return redirect(url_for('listagem'))  # Redireciona para a listagem se já estiver logado
 
     if request.method == 'POST':
         email = request.form.get('email')
@@ -83,43 +90,34 @@ def login():
         
         user = User.query.filter_by(email=email).first()
         
-        # 1. Checa se o usuário existe E se o hash da senha confere
         if user and bcrypt.check_password_hash(user.password, password):
-            # 2. Login bem-sucedido
-            login_user(user, remember=True)
+            login_user(user)
             flash('Login bem-sucedido!', 'success')
-            
-            # Redireciona para a próxima página ou listagem
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('listagem'))
-        else:
-            # 3. Falha no login
-            flash('Login falhou. Verifique e-mail e senha.', 'danger')
-            
+            next_page = request.args.get('next')  # Para redirecionar para a página que o usuário queria acessar
+            return redirect(next_page) if next_page else redirect(url_for('listagem'))  # Redireciona para a listagem
+
+        flash('Login falhou. Verifique e-mail e senha.', 'danger')
     return render_template('login.html')
+
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     """Página de Cadastro (Lógica REAL com DB)."""
-    # Se o usuário já estiver logado, redireciona
     if current_user.is_authenticated:
         flash('Você já está logado!', 'info')
-        return redirect(url_for('listagem'))
+        return redirect(url_for('listagem'))  # Se estiver logado, redireciona para a listagem.
 
     if request.method == 'POST':
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
         
-        # 1. Validação (Email já existe)
         if User.query.filter_by(email=email).first():
             flash('Este e-mail já está cadastrado. Tente fazer login.', 'danger')
             return render_template('cadastro.html')
-        
-        # 2. Criação Segura do HASH
+
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         
-        # 3. Criação do Usuário e Salva no Banco
         novo_usuario = User(email=email, username=username, password=hashed_password)
         db.session.add(novo_usuario)
         db.session.commit()
@@ -129,7 +127,9 @@ def cadastro():
         
     return render_template('cadastro.html')
 
+
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     flash('Você foi desconectado.', 'info')

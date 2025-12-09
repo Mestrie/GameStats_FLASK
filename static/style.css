@@ -1,3 +1,7 @@
+/* ------------------------------------------------------ */
+/*  ESTILOS GERAIS                                         */
+/* ------------------------------------------------------ */
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -7,127 +11,186 @@ body {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
+main {
+    padding: 40px 0;
+    min-height: 80vh;
+}
+
+/* ------------------------------------------------------ */
+/*  HEADER / NAVBAR                                        */
+/* ------------------------------------------------------ */
+
 header {
-    background-color: #4b367c; /* Cor da Twitch */
+    background-color: #4b367c; /* Roxo Twitch */
     color: white;
-    padding: 10px 0;
+    padding: 12px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-header nav {
+header .container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
 }
 
-header nav .logo {
-    font-size: 1.5em;
+header .logo {
+    font-size: 1.7em;
     font-weight: bold;
     text-decoration: none;
     color: white;
 }
 
 header nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
     display: flex;
+    list-style: none;
+    gap: 10px;
 }
 
 header nav ul li a {
     color: white;
     text-decoration: none;
-    padding: 10px 15px;
-    display: block;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    padding: 10px 14px;
+    border-radius: 6px;
+    transition: 0.25s;
 }
 
 header nav ul li a:hover {
+    background-color: #6b4faf;
+}
+
+/* Menus quando logado */
+header nav ul li span {
+    color: #e6e6e6;
+    font-weight: bold;
+    padding: 10px 14px;
+}
+
+/* ------------------------------------------------------ */
+/*  BOTÕES                                                 */
+/* ------------------------------------------------------ */
+
+.btn-primary {
+    background-color: #4b367c;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.1em;
+    border-radius: 8px;
+    margin-top: 20px;
+    transition: 0.25s;
+}
+
+.btn-primary:hover {
     background-color: #6a4fa4;
 }
 
-.btn-login {
-    background-color: #ff9900;
-    font-weight: bold;
-}
-.btn-login:hover {
-    background-color: #e68a00 !important;
-}
+/* ------------------------------------------------------ */
+/*  HOME PAGE (index.html)                                 */
+/* ------------------------------------------------------ */
 
-main {
-    padding: 40px 0;
-    min-height: 80vh; /* Garante que o footer fique embaixo */
-}
-
-footer {
-    background-color: #333;
-    color: white;
+.hero {
     text-align: center;
-    padding: 15px 0;
+    background: white;
+    padding: 50px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
-/* Estilos de Formulário */
+.hero h1 {
+    font-size: 2.5em;
+    color: #4b367c;
+}
+
+.hero p {
+    font-size: 1.2em;
+    margin-top: 10px;
+    color: #555;
+}
+
+.features {
+    margin-top: 50px;
+    display: grid;
+    gap: 25px;
+}
+
+.feature-item {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+}
+
+.feature-item h3 {
+    margin-top: 0;
+    color: #4b367c;
+}
+
+/* ------------------------------------------------------ */
+/* FORMULARIOS                                             */
+/* ------------------------------------------------------ */
+
 .form-box {
     background: white;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     margin: 40px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* Estilos para o Dashboard */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
+/* Campos de formulário padrão */
+.input-field {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: 0.2s;
 }
-.chart-card {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+.input-field:focus {
+    border-color: #4b367c;
+    outline: none;
+    box-shadow: 0 0 4px rgba(75, 54, 124, 0.3);
 }
-/* --- Estilos para a Listagem de Jogos (Cards) --- */
+
+
+/* ------------------------------------------------------ */
+/* CARDS DOS JOGOS                                         */
+/* ------------------------------------------------------ */
 
 .lista-jogos-grid {
-    /* Define o layout como Grade (Grid) */
     display: grid;
-    /* 3 colunas, ajustando o tamanho automaticamente */
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
     margin-top: 30px;
 }
 
 .card-jogo {
-    background-color: white;
+    background: white;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Garante que a imagem se ajuste ao raio da borda */
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: 0.25s;
 }
 
 .card-jogo:hover {
-    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.card-jogo a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .card-jogo img {
     width: 100%;
-    /* Define uma altura fixa para que todos os cards fiquem uniformes */
-    height: 350px; 
-    object-fit: cover; /* Garante que a imagem preencha a área sem distorcer */
+    height: 350px;
+    object-fit: cover;
 }
 
 .info-jogo {
@@ -136,35 +199,64 @@ footer {
 }
 
 .info-jogo h3 {
-    margin-top: 0;
-    font-size: 1.2em;
+    margin: 0;
     color: #4b367c;
 }
-/* --- Estilos para a Paginação --- */
+
+/* ------------------------------------------------------ */
+/* PAGINAÇÃO                                               */
+/* ------------------------------------------------------ */
+
 .paginacao {
+    margin-top: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 40px 0;
-    padding: 20px 0;
-    border-top: 1px solid #ddd;
+    padding-top: 25px;
+    border-top: 1px solid #ccc;
 }
 
 .btn-pagina {
     background-color: #4b367c;
-    color: white !important; /* Cor branca para o texto do botão */
-    text-decoration: none;
+    color: white !important;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 6px;
     font-weight: bold;
-    transition: background-color 0.3s;
+    text-decoration: none;
+    transition: 0.25s;
 }
 
 .btn-pagina:hover {
     background-color: #6a4fa4;
 }
 
-/* Garante que o span vazio no lugar do botão "Anterior" mantenha o layout */
 .paginacao span {
-    width: 200px; /* Ajuste o tamanho conforme o botão */
+    width: 200px;
 }
+
+/* ------------------------------------------------------ */
+/* FOOTER                                                  */
+/* ------------------------------------------------------ */
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+}
+
+/* ------------------------------------------------------ */
+/* FLASH MESSAGES                                          */
+/* ------------------------------------------------------ */
+
+.flash {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.flash.success { background: #d4f8d4; color: #256b25; }
+.flash.info    { background: #e6f0ff; color: #285fa0; }
+.flash.warning { background: #fff5d1; color: #8b6d00; }
+.flash.danger  { background: #ffe0e0; color: #9c1c1c; }

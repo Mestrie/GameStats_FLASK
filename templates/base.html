@@ -15,11 +15,15 @@
             <nav>
                 <ul>
                     <li><a href="{{ url_for('index') }}">Início</a></li>
-                    
                     <li><a href="{{ url_for('listagem') }}">Catálogo de Jogos</a></li>
                     
-                    <li><a href="{{ url_for('login') }}">Login</a></li>
-                    <li><a href="{{ url_for('cadastro') }}">Cadastro</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('logout') }}">Sair</a></li>
+                        <li><span>Olá, {{ current_user.username }}</span></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('cadastro') }}">Cadastro</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
@@ -27,6 +31,14 @@
 
     <main>
         <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
             {% block content %}{% endblock %}
         </div>
     </main>
