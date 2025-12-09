@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Alterar Senha - Stream Insights{% endblock %}
+
+{% block content %}
+
+<div class="form-box">
+
+    <h2 style="text-align:center; color:#4b367c;">Alterar Senha</h2>
+
+    {% for msg in get_flashed_messages(with_categories=true) %}
+        <div class="flash {{ msg[0] }}">{{ msg[1] }}</div>
+    {% endfor %}
+
+    <form method="POST">
+
+        <label for="senha_atual">Senha atual:</label>
+        <input type="password" name="senha_atual" class="input-field" required>
+
+        <label for="nova_senha">Nova senha:</label>
+        <input type="password" name="nova_senha" class="input-field" required>
+
+        <button type="submit" class="btn-primary" style="width:100%;">Atualizar Senha</button>
+    </form>
+
+</div>
+
+{% endblock %}

@@ -24,7 +24,14 @@
                         <li><a href="{{ url_for('login') }}">Login</a></li>
                         <li><a href="{{ url_for('cadastro') }}">Cadastro</a></li>
                     {% endif %}
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    {% endif %}
+                    <li>
+                        <button id="toggle-theme" class="tema-btn">🌙</button>
+                    </li>
                 </ul>
+                
             </nav>
         </div>
     </header>
@@ -48,5 +55,6 @@
             <p>&copy; 2025 Stream Insights. Integrado com Twitch/IGDB APIs.</p>
         </div>
     </footer>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
 </html>

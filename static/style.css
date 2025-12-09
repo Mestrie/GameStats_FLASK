@@ -1,13 +1,31 @@
 /* ------------------------------------------------------ */
-/*  ESTILOS GERAIS                                         */
+/*  VARIÁVEIS DE TEMA (CLARO/ESCURO)                      */
 /* ------------------------------------------------------ */
 
+:root {
+    --bg-color: #f4f4f9;
+    --text-color: #333;
+    --header-bg: #4b367c;
+    --card-bg: #fff;
+    --footer-bg: #333;
+}
+
+/* Tema escuro */
+.dark-theme {
+    --bg-color: #1e1e1e;
+    --text-color: #eaeaea;
+    --header-bg: #2b1d47;
+    --card-bg: #2a2a2a;
+    --footer-bg: #000;
+}
+
+/* Aplicação das variáveis */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 .container {
@@ -26,7 +44,7 @@ main {
 /* ------------------------------------------------------ */
 
 header {
-    background-color: #4b367c; /* Roxo Twitch */
+    background-color: var(--header-bg);
     color: white;
     padding: 12px 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
@@ -63,11 +81,24 @@ header nav ul li a:hover {
     background-color: #6b4faf;
 }
 
-/* Menus quando logado */
 header nav ul li span {
     color: #e6e6e6;
     font-weight: bold;
     padding: 10px 14px;
+}
+
+/* Botão de tema */
+.theme-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: white;
+    transition: transform 0.2s;
+}
+
+.theme-btn:hover {
+    transform: scale(1.1);
 }
 
 /* ------------------------------------------------------ */
@@ -96,7 +127,7 @@ header nav ul li span {
 
 .hero {
     text-align: center;
-    background: white;
+    background: var(--card-bg);
     padding: 50px 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
@@ -110,7 +141,6 @@ header nav ul li span {
 .hero p {
     font-size: 1.2em;
     margin-top: 10px;
-    color: #555;
 }
 
 .features {
@@ -120,7 +150,7 @@ header nav ul li span {
 }
 
 .feature-item {
-    background: white;
+    background: var(--card-bg);
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.07);
@@ -132,11 +162,11 @@ header nav ul li span {
 }
 
 /* ------------------------------------------------------ */
-/* FORMULARIOS                                             */
+/* FORMULÁRIOS                                             */
 /* ------------------------------------------------------ */
 
 .form-box {
-    background: white;
+    background: var(--card-bg);
     padding: 30px;
     border-radius: 8px;
     max-width: 400px;
@@ -144,7 +174,6 @@ header nav ul li span {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* Campos de formulário padrão */
 .input-field {
     width: 100%;
     padding: 12px;
@@ -162,7 +191,6 @@ header nav ul li span {
     box-shadow: 0 0 4px rgba(75, 54, 124, 0.3);
 }
 
-
 /* ------------------------------------------------------ */
 /* CARDS DOS JOGOS                                         */
 /* ------------------------------------------------------ */
@@ -175,7 +203,7 @@ header nav ul li span {
 }
 
 .card-jogo {
-    background: white;
+    background: var(--card-bg);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     overflow: hidden;
@@ -230,16 +258,12 @@ header nav ul li span {
     background-color: #6a4fa4;
 }
 
-.paginacao span {
-    width: 200px;
-}
-
 /* ------------------------------------------------------ */
 /* FOOTER                                                  */
 /* ------------------------------------------------------ */
 
 footer {
-    background-color: #333;
+    background-color: var(--footer-bg);
     color: white;
     text-align: center;
     padding: 15px 0;

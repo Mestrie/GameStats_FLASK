@@ -137,5 +137,7 @@ function desenharGraficoVisualizadores(dados) {
     });
 }
 
+
+
 // Chama a função principal ao carregar a página
 window.onload = carregarDashboard;

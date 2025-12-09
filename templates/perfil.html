@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil - Stream Insights{% endblock %}
+
+{% block content %}
+
+<div class="perfil-box">
+
+    <h2 class="perfil-title">Meu Perfil</h2>
+
+    <div class="perfil-info">
+        <p><strong>Usuário:</strong> {{ current_user.username }}</p>
+        <p><strong>E-mail:</strong> {{ current_user.email }}</p>
+        <p><strong>ID:</strong> {{ current_user.id }}</p>
+    </div>
+
+    <div class="perfil-actions">
+        <a href="{{ url_for('alterar_senha') }}" class="btn-primary">Alterar Senha</a>
+        <a href="{{ url_for('logout') }}" class="btn-danger">Sair</a>
+    </div>
+
+</div>
+
+{% endblock %}

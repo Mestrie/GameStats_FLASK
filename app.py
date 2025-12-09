@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
 from datetime import timedelta
+from flask_login import login_required, logout_user, current_user
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask import render_template
 
 #Funções para geração e verificação de tokens de reset de senha
 def gerar_token_reset(user_id, expires_sec=3600):
@@ -68,7 +71,7 @@ from python.models import User, load_user
 # 3. ATRIBUIÇÃO DA FUNÇÃO OBRIGATÓRIA (CRUCIAL!)
 
 # ============================================
-# 🗺️ ROTAS PRINCIPAIS (Front-end)
+# ROTAS PRINCIPAIS (Front-end)
 # ============================================
 
 @app.route('/')
@@ -127,13 +130,32 @@ def cadastro():
         
     return render_template('cadastro.html')
 
-
+'''
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('Você foi desconectado.', 'info')
     return redirect(url_for('index'))
+'''
+@app.route("/alterar_senha", methods=["GET", "POST"])
+@login_required
+def alterar_senha():
+    if request.method == "POST":
+        atual = request.form["senha_atual"]
+        nova = request.form["nova_senha"]
+
+        if not check_password_hash(current_user.password, atual):
+            flash("Senha atual incorreta.", "danger")
+            return redirect(url_for("alterar_senha"))
+
+        current_user.password = generate_password_hash(nova)
+        db.session.commit()
+
+        flash("Senha atualizada com sucesso!", "success")
+        return redirect(url_for("perfil"))
+
+    return render_template("alterar_senha.html")
 
 @app.route('/esqueci_senha', methods=['GET', 'POST'])
 def esqueci_senha():
@@ -239,6 +261,17 @@ def dashboards_detalhes(game_id):
         detalhes=detalhes_jogo 
     )
 
+@app.route("/perfil")
+@login_required
+def perfil():
+    return render_template("perfil.html", user=current_user)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("Você saiu da sua conta.", "info")
+    return redirect(url_for('login'))
 
 # ============================================
 # 🖥️ ROTAS DE API (Retornam JSON)
