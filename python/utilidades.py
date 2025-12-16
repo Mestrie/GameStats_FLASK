@@ -1,11 +1,18 @@
 import requests
 import time 
 import random 
-import os # ⬅️ ADICIONE ESTE
-from dotenv import load_dotenv # ⬅️ ADICIONE ESTE
+import os 
+from dotenv import load_dotenv 
+from python.models import Game
+from python.extensions import db
+from datetime import datetime, timedelta
+from python.traducao import traduzir_texto
+
+
+
 
 # Carrega as variáveis do arquivo .env
-load_dotenv() # ⬅️ ADICIONE ESTE
+load_dotenv() 
 
 # ============================================
 # 🔑 CONSTANTES E CONFIGURAÇÕES
@@ -31,6 +38,8 @@ TOKEN_ENDPOINT = "https://id.twitch.tv/oauth2/token"
 # Variável global simples para cache do token
 _token_cache = {"token": None, "expires_at": 0}
 
+
+ 
 # ============================================
 # 🔄 FUNÇÕES AUXILIARES DE API (Twitch/IGDB)
 # ============================================
@@ -257,3 +266,47 @@ def realizar_analise_dashboards(game_id, game_name):
         "titulo": f"Streams Ativas de: {game_name}"
     }
     return dados_analise
+
+# ============================================
+# 🔄 Função “get or fetch” (cache inteligente)
+# ============================================
+
+
+
+def get_or_fetch_game(game_id, max_age_days=7):
+    """
+    Busca o jogo no banco de dados.
+    Se não existir ou estiver desatualizado, busca na IGDB e salva.
+    """
+
+    # 1️⃣ Tenta pegar do banco
+    jogo = Game.query.get(game_id)
+
+    # 2️⃣ Se existir e ainda for recente, retorna direto
+    if jogo and jogo.updated_at:
+        limite = datetime.utcnow() - timedelta(days=max_age_days)
+        if jogo.updated_at >= limite:
+            return jogo
+
+    # 3️⃣ Se não existe ou está velho, busca na API
+    dados = obter_detalhes_jogo_igdb(game_id)
+    if not dados:
+        return None
+
+    # 4️⃣ Se não existia, cria
+    if not jogo:
+        jogo = Game(id=game_id)
+
+    # 5️⃣ Atualiza dados
+    jogo.name = dados.get("name")
+    summary_en = dados.get("summary")
+    jogo.summary = traduzir_texto(summary_en) if summary_en else None
+    jogo.rating = dados.get("total_rating") or 0
+    jogo.rating_count = dados.get("total_rating_count")
+    jogo.image_url = dados.get("imagem_url")
+    #jogo.updated_at = datetime.utcnow()
+
+    db.session.add(jogo)
+    db.session.commit()
+
+    return jogo

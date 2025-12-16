@@ -10,6 +10,11 @@ from datetime import timedelta
 from flask_login import login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import render_template
+from python.utilidades import get_or_fetch_game
+from python.models import User, Game, Review
+from sqlalchemy import func
+from flask import abort
+
 
 #Funções para geração e verificação de tokens de reset de senha
 def gerar_token_reset(user_id, expires_sec=3600):
@@ -238,28 +243,43 @@ def listagem():
         termo_pesquisa=termo_pesquisa 
     )
 
-# ROTA DINÂMICA: Exibe os Detalhes do Jogo
-@app.route('/dashboards/<game_id>')
+@app.route('/dashboards/<int:game_id>')
 @login_required
 def dashboards_detalhes(game_id):
-    
-    """
-    Busca detalhes completos do jogo na IGDB e renderiza o template de detalhes.
-    """
-    
-    detalhes_jogo = obter_detalhes_jogo_igdb(game_id)
-    
-    if not detalhes_jogo:
-        return "Jogo não encontrado ou erro na API.", 404
 
-    game_name = detalhes_jogo.get("name", "Jogo Desconhecido")
-    
+    detalhes_jogo = get_or_fetch_game(game_id)
+    if not detalhes_jogo:
+        abort(404)
+
+    review_usuario = Review.query.filter_by(
+        user_id=current_user.id,
+        game_id=game_id
+    ).first()
+
+    # 📊 Média das notas
+    media_usuarios = db.session.query(
+        func.avg(Review.rating)
+    ).filter_by(game_id=game_id).scalar()
+
+    # 👥 Quantidade de usuários que avaliaram
+    quantidade_usuarios = db.session.query(
+        func.count(Review.id)
+    ).filter_by(game_id=game_id).scalar()
+
+    reviews = Review.query.filter_by(game_id=game_id).all()
+
     return render_template(
-        'detalhes.html',  
-        game_id=game_id, 
-        game_name=game_name,
-        detalhes=detalhes_jogo 
+        "detalhes.html",
+        detalhes=detalhes_jogo,
+        game_id=game_id,
+        review_usuario=review_usuario,
+        media_usuarios=media_usuarios,
+        quantidade_usuarios=quantidade_usuarios,  # ⬅️ AQUI
+        reviews=reviews
     )
+
+
+
 
 @app.route("/perfil")
 @login_required
@@ -302,6 +322,34 @@ def api_analises_filtrada(game_id):
     dados = realizar_analise_dashboards(game_id, game_name)
     return jsonify(dados)
 
+@app.route('/review/<int:game_id>', methods=['POST'])
+@login_required
+def salvar_review(game_id):
+    rating = int(request.form.get('rating'))
+    comment = request.form.get('comment')
+
+    # Verifica se já existe review
+    review_existente = Review.query.filter_by(
+        user_id=current_user.id,
+        game_id=game_id
+    ).first()
+
+    if review_existente:
+        review_existente.rating = rating
+        review_existente.comment = comment
+    else:
+        nova_review = Review(
+            rating=rating,
+            comment=comment,
+            user_id=current_user.id,
+            game_id=game_id
+        )
+        db.session.add(nova_review)
+
+    db.session.commit()
+    flash('Review salva com sucesso!', 'success')
+
+    return redirect(url_for('dashboards_detalhes', game_id=game_id))
 
 # ============================================
 # 🚀 INICIALIZAÇÃO DO FLASK
@@ -312,7 +360,7 @@ if __name__ == '__main__':
     # ⚠️ BLOCO DE CRIAÇÃO DE TABELAS (Execute APENAS uma vez!)
     with app.app_context():
         # DESCOMENTE A LINHA ABAIXO, RODE 'python app.py' E COMENTE-A NOVAMENTE!
-        #db.create_all() 
+        db.create_all() 
         print("Verificação: O banco de dados está pronto para uso.")
         
     app.run(debug=True)
