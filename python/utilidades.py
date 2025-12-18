@@ -7,6 +7,7 @@ from python.models import Game
 from python.extensions import db
 from datetime import datetime, timedelta
 from python.traducao import traduzir_texto
+from python.models import Filtro
 
 
 
@@ -108,7 +109,7 @@ def obter_detalhes_jogo_igdb(game_id):
         "Client-ID": CLIENT_ID,
         "Authorization": f"Bearer {token}"
     }
-    fields = "name, summary, total_rating, total_rating_count, genres.name, platforms.name, cover.url"
+    fields = "name, summary, total_rating, total_rating_count, genres.name, game_modes.name, platforms.name, cover.url, first_release_date, involved_companies.company.name, involved_companies.developer"
     body = f"fields {fields}; where id = {game_id};"
 
     try:
@@ -133,11 +134,25 @@ def obter_detalhes_jogo_igdb(game_id):
 
 # python/utilidades.py (Função buscar_catalogo_igdb)
 
-def buscar_catalogo_igdb(token, offset, termo_pesquisa=None):
+def buscar_catalogo_igdb(
+    token,
+    offset,
+    termo_pesquisa=None,
+    platform=None,
+    genre=None,
+    year=None,
+    developer=None,
+    mode=None
+):
     if not token:
         return []
 
     headers = {"Client-ID": CLIENT_ID, "Authorization": f"Bearer {token}"}
+
+    # ----------------------------
+    # Verifica se existe algum filtro ativo
+    # ----------------------------
+    filtros_ativos = any([platform, genre, year, developer, mode])
 
     if termo_pesquisa:
         # 🔍 PESQUISA — sem sort (IGDB não aceita), sem where
@@ -145,19 +160,69 @@ def buscar_catalogo_igdb(token, offset, termo_pesquisa=None):
         
         query = f'''
             search "{termo_pesquisa}";
-            fields name, cover.url, total_rating, aggregated_rating;
+            fields name, cover.url, total_rating, aggregated_rating,
+                   platforms.name, genres.name, game_modes.name,
+                   first_release_date, involved_companies.company.name;
             limit {JOGOS_POR_PAGINA};
             offset {offset};
         '''
     else:
-        # 📋 LISTAGEM — agora filtrando apenas jogos com nota
-        query = f'''
-            fields name, cover.url, total_rating, aggregated_rating;
-            where total_rating != null | aggregated_rating != null;
-            sort name asc;
-            limit {JOGOS_POR_PAGINA};
-            offset {offset};
-        '''
+        # ----------------------------
+        # Monta filtros dinamicamente apenas se existirem
+        # ----------------------------
+        where_clauses = []
+
+        if platform:
+            where_clauses.append(f'platforms.name = "{platform}"')
+
+        if genre:
+            where_clauses.append(f'genres.name = "{genre}"')
+
+        if mode:
+            where_clauses.append(f'game_modes.name = "{mode}"')
+
+        if developer:
+            where_clauses.append(f'involved_companies.company.name = "{developer}"')
+
+        if year:
+            from datetime import datetime
+
+            # Converte o início e fim do ano em timestamps Unix
+            start_ts = int(datetime(int(year), 1, 1, 0, 0, 0).timestamp())
+            end_ts = int(datetime(int(year), 12, 31, 23, 59, 59).timestamp())
+
+            # Adiciona a cláusula where usando os timestamps
+            where_clauses.append(f'first_release_date >= {start_ts} & first_release_date <= {end_ts}')
+
+
+        # ----------------------------
+        # Caso NÃO haja filtros → usa a listagem padrão
+        # ----------------------------
+        if not filtros_ativos:
+            query = f'''
+                fields name, cover.url, total_rating, aggregated_rating,
+                       platforms.name, genres.name, game_modes.name,
+                       first_release_date, involved_companies.company.name;
+                where total_rating != null | aggregated_rating != null;
+                sort name asc;
+                limit {JOGOS_POR_PAGINA};
+                offset {offset};
+            '''
+        else:
+            # ----------------------------
+            # Caso HAJA filtros → aplica where dinâmico
+            # ----------------------------
+            where_query = " & ".join(where_clauses)
+
+            query = f'''
+                fields name, cover.url, total_rating, aggregated_rating,
+                       platforms.name, genres.name, game_modes.name,
+                       first_release_date, involved_companies.company.name;
+                where {where_query};
+                sort name asc;
+                limit {JOGOS_POR_PAGINA};
+                offset {offset};
+            '''
 
     try:
         resp = requests.post(IGDB_ENDPOINT, headers=headers, data=query)
@@ -167,8 +232,6 @@ def buscar_catalogo_igdb(token, offset, termo_pesquisa=None):
         # 🧹 FILTRAR NA PESQUISA TAMBÉM (opcional mas RECOMENDADO)
         if termo_pesquisa:
             jogos = [j for j in jogos if j.get("total_rating") or j.get("aggregated_rating")]
-
-            # Ordenar alfabeticamente
             jogos = sorted(jogos, key=lambda x: x.get("name", "").lower())
 
         return jogos
@@ -176,6 +239,101 @@ def buscar_catalogo_igdb(token, offset, termo_pesquisa=None):
     except requests.exceptions.RequestException as e:
         print(f"Erro ao buscar catálogo IGDB: {e}")
         return []
+
+
+# ============================================
+# 🔄 Funções de Filtros para botões
+ 
+def buscar_filtros_botoes(token):
+    # 🎯 Busca filtros para botões
+    # Primeiro tenta buscar do banco de dados
+    # Se não existir, busca da IGDB e salva
+
+    if not token:
+        return {}
+
+    filtros = {
+        "platforms": [],
+        "genres": [],
+        "modes": [],
+        "developers": []
+        
+    }
+
+    # 🔎 Busca filtros já salvos no banco
+    filtros_db = Filtro.query.all()
+
+    if filtros_db:
+        for f in filtros_db:
+            if f.tipo == "platform":
+                filtros["platforms"].append(f.nome)
+            elif f.tipo == "genre":
+                filtros["genres"].append(f.nome)
+            elif f.tipo == "mode":
+                filtros["modes"].append(f.nome)
+            elif f.tipo == "developer":
+                filtros["developers"].append(f.nome)
+
+
+        return filtros
+
+    # 🌐 Se não existir no banco, busca da IGDB
+    headers = {
+        "Client-ID": CLIENT_ID,
+        "Authorization": f"Bearer {token}"
+    }
+
+    endpoints = {
+        "platform": "platforms",
+        "genre": "genres",
+        "mode": "game_modes",
+        "developer": "companies"
+    }
+
+    for tipo, endpoint in endpoints.items():
+        query = """
+            fields id, name;
+            limit 200;
+        """
+
+        resp = requests.post(
+            f"https://api.igdb.com/v4/{endpoint}",
+            headers=headers,
+            data=query
+        )
+
+        if resp.status_code == 200:
+            dados = resp.json()
+
+            for item in dados:
+                igdb_id = item.get("id")
+                nome = item.get("name")
+
+                if igdb_id and nome:
+                    # 💾 Salva o filtro no banco
+                    db.session.add(
+                        Filtro(
+                            igdb_id=igdb_id,
+                            tipo=tipo,
+                            nome=nome
+                        )
+                    )
+
+                    # 📌 Adiciona também no retorno
+                    if tipo == "platform":
+                        filtros["platforms"].append(nome)
+                    elif tipo == "genre":
+                        filtros["genres"].append(nome)
+                    elif tipo == "mode":
+                        filtros["modes"].append(nome)
+                    elif tipo == "developer":
+                        filtros["developers"].append(nome)
+
+    db.session.commit()
+
+    return filtros
+
+
 
 
 
@@ -304,6 +462,23 @@ def get_or_fetch_game(game_id, max_age_days=7):
     jogo.rating = dados.get("total_rating") or 0
     jogo.rating_count = dados.get("total_rating_count")
     jogo.image_url = dados.get("imagem_url")
+    jogo.genres = ", ".join([g["name"] for g in dados.get("genres", [])])
+    jogo.platforms = ", ".join([p["name"] for p in dados.get("platforms", [])])
+    jogo.game_modes = ", ".join([m["name"] for m in dados.get("game_modes", [])])
+
+    # Desenvolvedora / publicadora
+    companies = dados.get("involved_companies", [])
+    devs = []
+    for c in companies:
+        if c.get("developer"):
+            devs.append(c["company"]["name"])
+    jogo.developers = ", ".join(devs)
+
+    # Data
+    if dados.get("first_release_date"):
+        jogo.release_date = datetime.utcfromtimestamp(
+            dados["first_release_date"]
+        )
     #jogo.updated_at = datetime.utcnow()
 
     db.session.add(jogo)

@@ -4,28 +4,42 @@
 
 {% block content %}
 
-<div class="form-box">
+<!-- ========================= -->
+<!-- 📝 FORMULÁRIO DE LOGIN -->
+<!-- ========================= -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card p-4 shadow-sm" style="max-width: 400px; width: 100%;">
+        <h2 class="text-center text-primary mb-4">Login</h2>
 
-    <h2 style="text-align:center; color:#4b367c;">Login</h2>
+        <!-- Mensagens flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'danger' else category }} mb-3" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <!-- Renderiza mensagens flash -->
-    {% for msg in get_flashed_messages(with_categories=true) %}
-        <div class="flash {{ msg[0] }}">{{ msg[1] }}</div>
-    {% endfor %}
+        <form method="POST">
+            <div class="mb-3">
+                <label for="email" class="form-label">E-mail:</label>
+                <input type="email" name="email" id="email" required class="form-control" placeholder="Digite seu e-mail">
+            </div>
 
-    <form method="POST">
-        <label for="email">E-mail:</label>
-        <input type="email" name="email" required class="input-field">
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha:</label>
+                <input type="password" name="password" id="password" required class="form-control" placeholder="Digite sua senha">
+            </div>
 
-        <label for="password">Senha:</label>
-        <input type="password" name="password" required class="input-field">
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
 
-        <button type="submit" class="btn-primary" style="width:100%;">Entrar</button>
-    </form>
-
-    <p style="text-align:center; margin-top:15px;">
-        Não tem conta? <a href="{{ url_for('cadastro') }}">Cadastrar</a>
-    </p>
+        <p class="text-center mt-3">
+            Não tem conta? <a href="{{ url_for('cadastro') }}">Cadastrar</a>
+        </p>
+    </div>
 </div>
 
 {% endblock %}

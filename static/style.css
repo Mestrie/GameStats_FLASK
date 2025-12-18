@@ -1,31 +1,39 @@
-/* ------------------------------------------------------ */
-/*  VARIÁVEIS DE TEMA (CLARO/ESCURO)                      */
-/* ------------------------------------------------------ */
-
+/* ======================================================
+   VARIÁVEIS DE TEMA (CLARO / ESCURO)
+   ====================================================== */
 :root {
     --bg-color: #f4f4f9;
     --text-color: #333;
     --header-bg: #4b367c;
     --card-bg: #fff;
     --footer-bg: #333;
+    --btn-primary-bg: #4b367c;
+    --btn-primary-hover: #6a4fa4;
+    /* Cor para títulos no tema claro */
+    --accent-color: #4b367c; 
 }
 
-/* Tema escuro */
 .dark-theme {
     --bg-color: #1e1e1e;
     --text-color: #eaeaea;
     --header-bg: #2b1d47;
     --card-bg: #2a2a2a;
     --footer-bg: #000;
+    --btn-primary-bg: #4b367c;
+    --btn-primary-hover: #6a4fa4;
+    /* Roxo muito mais claro e vivo para o tema escuro */
+    --accent-color: #bb86fc; 
 }
 
-/* Aplicação das variáveis */
+/* ======================================================
+   BODY E CONTAINER
+   ====================================================== */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
 }
 
 .container {
@@ -39,10 +47,9 @@ main {
     min-height: 80vh;
 }
 
-/* ------------------------------------------------------ */
-/*  HEADER / NAVBAR                                        */
-/* ------------------------------------------------------ */
-
+/* ======================================================
+   HEADER / NAVBAR
+   ====================================================== */
 header {
     background-color: var(--header-bg);
     color: white;
@@ -54,6 +61,7 @@ header .container {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 header .logo {
@@ -67,6 +75,7 @@ header nav ul {
     display: flex;
     list-style: none;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 header nav ul li a {
@@ -78,7 +87,7 @@ header nav ul li a {
 }
 
 header nav ul li a:hover {
-    background-color: #6b4faf;
+    background-color: #6a4faf;
 }
 
 header nav ul li span {
@@ -88,7 +97,7 @@ header nav ul li span {
 }
 
 /* Botão de tema */
-.theme-btn {
+.tema-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -97,17 +106,16 @@ header nav ul li span {
     transition: transform 0.2s;
 }
 
-.theme-btn:hover {
+.tema-btn:hover {
     transform: scale(1.1);
 }
 
-/* ------------------------------------------------------ */
-/*  BOTÕES                                                 */
-/* ------------------------------------------------------ */
-
-.btn-primary {
-    background-color: #4b367c;
-    color: white;
+/* ======================================================
+   BOTÕES
+   ====================================================== */
+.btn-primary, .btn-primary:hover {
+    background-color: var(--btn-primary-bg) !important;
+    color: white !important;
     padding: 12px 25px;
     text-decoration: none;
     display: inline-block;
@@ -118,13 +126,12 @@ header nav ul li span {
 }
 
 .btn-primary:hover {
-    background-color: #6a4fa4;
+    background-color: var(--btn-primary-hover) !important;
 }
 
-/* ------------------------------------------------------ */
-/*  HOME PAGE (index.html)                                 */
-/* ------------------------------------------------------ */
-
+/* ======================================================
+   HERO E FEATURES (INDEX)
+   ====================================================== */
 .hero {
     text-align: center;
     background: var(--card-bg);
@@ -135,7 +142,7 @@ header nav ul li span {
 
 .hero h1 {
     font-size: 2.5em;
-    color: #4b367c;
+    color: var(--accent-color);
 }
 
 .hero p {
@@ -158,83 +165,173 @@ header nav ul li span {
 
 .feature-item h3 {
     margin-top: 0;
-    color: #4b367c;
+    color: var(--accent-color);
 }
 
-/* ------------------------------------------------------ */
-/* FORMULÁRIOS                                             */
-/* ------------------------------------------------------ */
-
+/* ======================================================
+   FORMULÁRIOS (ADAPTÁVEIS)
+   ====================================================== */
 .form-box {
     background: var(--card-bg);
     padding: 30px;
-    border-radius: 8px;
+    border-radius: 12px; /* Aumentei um pouco para combinar com os cards */
     max-width: 400px;
     margin: 40px auto;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05); /* Borda sutil */
 }
 
-.input-field {
+/* Campos de Entrada (Input e Textarea) */
+.input-field, 
+.form-box input, 
+.form-box textarea, 
+form.mb-4 input, 
+form.mb-4 textarea {
     width: 100%;
     padding: 12px;
     margin: 10px 0 20px 0;
-    border: 1px solid #bbb;
-    border-radius: 6px;
+    
+    /* MUDANÇA CHAVE: Fundo e texto agora seguem as variáveis */
+    background-color: var(--card-bg) !important; 
+    color: var(--text-color) !important;
+    
+    /* Borda sutil que se adapta ao tema */
+    border: 1px solid rgba(128, 128, 128, 0.3); 
+    border-radius: 8px;
     font-size: 1em;
     box-sizing: border-box;
-    transition: 0.2s;
+    transition: all 0.3s ease;
 }
 
-.input-field:focus {
-    border-color: #4b367c;
+/* Efeito de Foco (Ao clicar na caixa) */
+.input-field:focus, 
+.form-box input:focus, 
+.form-box textarea:focus, 
+form.mb-4 input:focus, 
+form.mb-4 textarea:focus {
+    /* Usa o roxo que foi definido para cada tema (escuro ou claro) */
+    border-color: var(--accent-color) !important; 
     outline: none;
-    box-shadow: 0 0 4px rgba(75, 54, 124, 0.3);
+    /* Sombra de brilho suave com a cor de destaque */
+    box-shadow: 0 0 8px rgba(187, 134, 252, 0.2); 
 }
 
-/* ------------------------------------------------------ */
-/* CARDS DOS JOGOS                                         */
-/* ------------------------------------------------------ */
-
-.lista-jogos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
+/* Ajuste específico para placeholders (o texto "fantasma" dentro da caixa) */
+input::placeholder, textarea::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
 }
 
+form.mb-4 button.btn-primary {
+    margin-top: 10px;
+}
+
+/* ======================================================
+   AJUSTE PARA LISTA DE INFORMAÇÕES (BOOTSTRAP)
+   ====================================================== */
+
+/* Alvo: O título "Informações" */
+main h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+/* Alvo: Os itens da lista */
+.list-group-item {
+    background-color: var(--card-bg) !important; /* Muda para escuro no Dark Mode */
+    color: var(--text-color) !important;        /* Texto fica claro no Dark Mode */
+    border: 1px solid rgba(128, 128, 128, 0.2) !important; /* Borda sutil */
+    padding: 15px 20px;
+}
+
+/* Alvo: O texto em negrito (Data, Plataformas, etc) */
+.list-group-item strong {
+    color: var(--accent-color); /* Usa o roxo/lilás que brilha no escuro */
+    margin-right: 5px;
+}
+
+/* Alvo: Links de Plataformas e Gêneros */
+.list-group-item a {
+    color: #6366f1; /* Um azul mais vivo para destacar no escuro */
+    font-weight: 500;
+}
+
+.list-group-item a:hover {
+    color: var(--accent-color);
+    text-decoration: underline !important;
+}
+
+/* ======================================================
+   CARDS DE JOGOS 
+   ====================================================== */
 .card-jogo {
     background: var(--card-bg);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    /* A mágica acontece aqui: uma borda semitransparente que aparece no claro e no escuro */
+    border: 1px solid rgba(0, 0, 0, 0.1); 
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    transition: 0.25s;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+/* Ajuste específico para o TEMA ESCURO */
+.dark-theme .card-jogo {
+    /* No tema escuro, a borda precisa ser mais clara que o fundo para destacar */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Sombra mais pesada no escuro */
 }
 
 .card-jogo:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    transform: translateY(-12px);
+    /* No hover, a borda brilha com a cor do tema roxo */
+    border-color: var(--header-bg);
+    box-shadow: 0 20px 40px rgba(75, 54, 124, 0.25);
 }
 
+/* Estilo da Imagem com Zoom */
 .card-jogo img {
     width: 100%;
     height: 350px;
     object-fit: cover;
+    transition: transform 0.5s ease;
 }
 
-.info-jogo {
-    padding: 15px;
-    text-align: center;
+.card-jogo:hover img {
+    transform: scale(1.05); /* Zoom suave na imagem */
 }
 
-.info-jogo h3 {
+/* Ajuste do Link para não ficar azul */
+.card-jogo a {
+    text-decoration: none !important;
+    color: inherit;
+}
+
+/* Área de informações abaixo da imagem */
+.card-jogo .card-body {
+    padding: 18px;
+    background: var(--card-bg);
+    z-index: 2;
+    position: relative;
+}
+
+.card-jogo .card-title {
     margin: 0;
-    color: #4b367c;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--accent-color) !important;
+    line-height: 1.3;
+    /* Faz o texto não quebrar o layout se o título for gigante */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* ------------------------------------------------------ */
-/* PAGINAÇÃO                                               */
-/* ------------------------------------------------------ */
-
+/* ======================================================
+   PAGINAÇÃO
+   ====================================================== */
 .paginacao {
     margin-top: 40px;
     display: flex;
@@ -245,7 +342,7 @@ header nav ul li span {
 }
 
 .btn-pagina {
-    background-color: #4b367c;
+    background-color: #4b367c !important;
     color: white !important;
     padding: 10px 20px;
     border-radius: 6px;
@@ -255,13 +352,32 @@ header nav ul li span {
 }
 
 .btn-pagina:hover {
-    background-color: #6a4fa4;
+    background-color: #6a4fa4 !important;
+}
+/* Customização da Paginação */
+.custom-pagination .page-link {
+    border-radius: 50px !important; /* Deixa os botões arredondados */
+    margin: 0 5px;
+    padding: 8px 20px;
+    color: #2563eb;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease-in-out;
 }
 
-/* ------------------------------------------------------ */
-/* FOOTER                                                  */
-/* ------------------------------------------------------ */
+.custom-pagination .page-item.active .page-link {
+    background-color: #4b367c; 
+    border-color: #2563eb;
+    color: white;
+}
 
+.custom-pagination .page-link:hover:not(.active) {
+    background-color: #f8f9fa;
+    transform: translateY(-2px); /* Efeito de levante */
+}
+
+/* ======================================================
+   FOOTER
+   ====================================================== */
 footer {
     background-color: var(--footer-bg);
     color: white;
@@ -269,10 +385,9 @@ footer {
     padding: 15px 0;
 }
 
-/* ------------------------------------------------------ */
-/* FLASH MESSAGES                                          */
-/* ------------------------------------------------------ */
-
+/* ======================================================
+   FLASH MESSAGES
+   ====================================================== */
 .flash {
     padding: 12px;
     border-radius: 6px;
@@ -284,3 +399,212 @@ footer {
 .flash.info    { background: #e6f0ff; color: #285fa0; }
 .flash.warning { background: #fff5d1; color: #8b6d00; }
 .flash.danger  { background: #ffe0e0; color: #9c1c1c; }
+
+/* ======================================================
+   FILTROS LISTAGEM
+   ====================================================== */
+.filtro {
+    position: relative;
+    
+}
+
+.filtro-btn {
+    padding: 8px 16px;
+    background-color: #2563eb;
+    color: white;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.filtro-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.filtro-dropdown {
+    display: none;
+    position: absolute;
+    top: 110%;
+    left: 0;
+    background-color: var(--card-bg);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-width: 180px;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    max-height: 260px;
+    overflow-y: auto;
+    
+}
+
+.filtro-dropdown a {
+    display: block;
+    padding: 8px 12px;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.filtro-dropdown a:hover {
+    background-color: #f1f5f9;
+}
+
+.filtro.active .filtro-dropdown {
+    display: block;
+}
+/* Scroll do mouse para bootstrap */
+.dropdown-menu {
+    max-height: 260px;    /* Limita a altura */
+    overflow-y: auto;     /* Ativa o scroll vertical */
+    overflow-x: hidden;   /* Evita scroll horizontal */
+}
+
+/* ======================================================
+   BARRAS DE NOTAS SIMPLES
+   ====================================================== */
+.nota-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.nota-card {
+    flex: 1 1 200px;
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.nota-card h4 {
+    margin: 0 0 10px 0;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.nota-card img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+}
+
+.nota-bar {
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #ddd;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.nota-bar-fill {
+    width: var(--percent, 0%);
+    height: 100%;
+    border-radius: 8px;
+    background-color: #4caf50; /* cor sólida */
+    transition: width 0.5s ease;
+}
+
+.nota-valor {
+    margin-top: 5px;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+/* ======================================================
+   CARDS DE REVIEWS (ESTILO FEEDBACK)
+   ====================================================== */
+.card {
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Borda sutil no claro */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: var(--text-color) !important; /* Força o texto a seguir o tema */
+}
+
+/* Ajuste específico para o TEMA ESCURO */
+.dark-theme .card {
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Borda clara no escuro */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sombra mais densa */
+}
+
+.card-title {
+    font-weight: 700;
+    color: var(--accent-color) !important;
+    margin-bottom: 10px;
+}
+
+/* Corrigindo o texto cinza que some no modo escuro */
+.text-muted {
+    color: var(--text-color) !important;
+    opacity: 0.7; /* Em vez de cinza fixo, usa o texto do tema com transparência */
+}
+
+.card-text {
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+/* Melhorando a borda de destaque (se  usar para o review do próprio usuário) */
+.border-primary {
+    border: 2px solid var(--header-bg) !important;
+}
+
+/* Efeito sutil ao passar o mouse */
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ======================================================
+   CUSTOMIZAÇÃO DA BARRA DE PESQUISA
+   ====================================================== */
+#search-form .form-control {
+    border-radius: 50px; /* Formato de pílula */
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+#search-form .form-control:focus {
+    border-color: var(--header-bg);
+    box-shadow: 0 0 0 0.25rem rgba(75, 54, 124, 0.25);
+}
+
+#search-form .btn-primary {
+    border-radius: 50px;
+    padding: 10px 25px;
+    margin-top: 0; /* Remove o margin-top de 20px que tem no .btn-primary geral */
+    background-color: var(--btn-primary-bg) !important;
+}
+
+#search-form .btn-outline-danger {
+    border-radius: 50px;
+    padding: 10px 20px;
+}
+
+/* Ajuste para o label não ficar desalinhado */
+#search-form .form-label {
+    margin-bottom: 0;
+    color: var(--text-color);
+}
+
+/* Container de fundo da busca */
+.bg-light.rounded-4.shadow-sm {
+    background-color: var(--card-bg) !important; /* Faz respeitar o tema Dark se ativo */
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* ======================================================
+   RESPONSIVIDADE
+   ====================================================== */
+@media (max-width: 600px) {
+    .nota-card {
+        flex: 1 1 100%;
+    }
+}

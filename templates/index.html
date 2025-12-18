@@ -3,28 +3,62 @@
 {% block title %}Início - Stream Insights{% endblock %}
 
 {% block content %}
-    <section class="hero">
-        <h1>Bem-vindo ao Stream Insights</h1>
-        <p>Sua plataforma de análise de dados em tempo real para jogos do catálogo IGDB e suas streams ativas na Twitch.</p>
-        
-        <!-- CORRIGIDO: O link agora aponta para a listagem/catálogo -->
-        <p>Descubra quais streams e jogos estão dominando a audiência. Acesse o <a href="{{ url_for('listagem') }}">Catálogo de Jogos</a> e visualize os Dashboards.</p>
-        
-    </section>
+<!-- ========================= -->
+<!-- 🎯 SEÇÃO HERO (INTRODUÇÃO) -->
+<!-- ========================= -->
+<section class="hero text-center p-5 bg-light rounded-4 shadow-sm mb-5">
+    <div class="container">
+        <h1 class="display-4">Bem-vindo ao Stream Insights</h1>
+        <p class="lead mt-3">
+            Sua plataforma de análise de dados em tempo real para jogos do catálogo IGDB e suas streams ativas na Twitch.
+        </p>
+        <p class="mt-3">
+            Descubra quais streams e jogos estão dominando a audiência. Acesse o catálogo completo de jogos e visualize os Dashboards.
+        </p>
+    </div>
+</section>
 
-    <section class="features">
-        <h2>O que oferecemos</h2>
-        <div class="feature-item">
-            <h3>Catálogo Detalhado</h3>
-            <p>Explore milhares de jogos da base de dados IGDB, com informações ricas sobre capas, títulos e IDs.</p>
+<!-- ========================= -->
+<!-- 🔍 SEÇÃO FEATURES (O QUE OFERECEMOS) -->
+<!-- ========================= -->
+<section class="features mb-5">
+    <div class="container">
+        <h2 class="mb-4 text-center">O que oferecemos</h2>
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">Catálogo Detalhado</h3>
+                        <p class="card-text">
+                            Explore milhares de jogos da base de dados IGDB, com informações ricas sobre capas, títulos e IDs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">Notas da IGDB x Usuários</h3>
+                        <p class="card-text">
+                            Compare as notas da IGDB com as médias das avaliações dos usuários para uma visão completa do desempenho dos jogos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">Reviwers</h3>
+                        <p class="card-text">
+                            Veja as principais análises e comentários dos usuários para entender melhor a recepção dos jogos e se ele é o que você procura.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="feature-item">
-            <h3>Análise de Streams</h3>
-            <p>Veja em tempo real o número de espectadores e informações das streams mais populares de cada jogo na Twitch.</p>
-        </div>
-        <div class="feature-item">
-            <h3>Dashboards Dinâmicos</h3>
-            <p>Dashboards específicos gerados na hora para cada jogo, permitindo uma análise focada e precisa.</p>
-        </div>
-    </section>
+    </div>
+</section>
 {% endblock %}

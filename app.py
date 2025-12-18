@@ -14,6 +14,9 @@ from python.utilidades import get_or_fetch_game
 from python.models import User, Game, Review
 from sqlalchemy import func
 from flask import abort
+from datetime import datetime
+
+
 
 
 #Funções para geração e verificação de tokens de reset de senha
@@ -41,8 +44,8 @@ load_dotenv()
 # 🎯 Importa de 'python.utilidades'
 from python.utilidades import (
     JOGOS_POR_PAGINA,
-    gerar_token, buscar_catalogo_igdb, obter_detalhes_jogo_igdb,
-    obter_nome_jogo_igdb, realizar_analise_dashboards, buscar_sugestoes_igdb
+    gerar_token, buscar_catalogo_igdb, obter_detalhes_jogo_igdb, 
+    obter_nome_jogo_igdb, realizar_analise_dashboards, buscar_sugestoes_igdb, buscar_filtros_botoes
 )
 
 # Configuração da aplicação Flask
@@ -69,7 +72,7 @@ login_manager.remember_cookie_duration = timedelta(minutes=30)  # Expira a sess�
 # ----------------------------------------------------
 # 2. IMPORTAÇÃO E ATRIBUIÇÃO CRUCIAL DO USER_LOADER
 # ----------------------------------------------------
-# ATENÇÃO: Importamos os modelos (que dependem de 'db' inicializado)
+# ATENÇÃO: Foi importado os modelos (que dependem de 'db' inicializado)
 # e atribuímos o loader IMEDIATAMENTE após a inicialização do 'login_manager'.
 from python.models import User, load_user
 
@@ -170,7 +173,7 @@ def esqueci_senha():
         if user:
             token = gerar_token_reset(user.id)
             link_reset = url_for('reset_senha', token=token, _external=True)
-            # Aqui você envia o email com link_reset
+            # Aqui  envia o email com link_reset
             print("Link de reset (teste):", link_reset)
         flash('Se o email existir no sistema, você receberá um link para reset de senha.', 'info')
     return render_template('esqueci_senha.html')
@@ -193,55 +196,125 @@ def reset_senha(token):
 
     return render_template('reset_senha.html')
 
+PLATFORM_MAP = {
+    "PS4": "PlayStation 4",
+    "PC": "PC (Microsoft Windows)",
+    "XBOX ONE": "Xbox One",
+    "Switch": "Nintendo Switch"
+}
 
 @app.route('/listagem')
-@login_required #
+@login_required
 def listagem():
-    """
-    Rota que busca e renderiza a listagem de jogos com paginação (IGDB).
-    Usa funções importadas de python.utilidades.
-    """
-    
-    # Captura o termo de pesquisa e a página.
+    # ----------------------------
+    # 📝 Parâmetros da URL
+    # ----------------------------
     termo_pesquisa = request.args.get('pesquisa', '').strip()
+    platform_filter = request.args.get('platform')   # filtro de plataforma
+    genre_filter = request.args.get('genre')         # filtro de gênero
+    year_filter = request.args.get('year')           # filtro de ano
+    developer_filter = request.args.get('developer') # filtro de desenvolvedora
+    mode_filter = request.args.get('mode')           # filtro de modo
     pagina_atual = request.args.get('pagina', 1, type=int)
-    
-    offset = (pagina_atual - 1) * JOGOS_POR_PAGINA
-    
-    token = gerar_token()
-    
-    # Chama a função de busca com o termo de pesquisa
-    jogos_brutos = buscar_catalogo_igdb(token, offset, termo_pesquisa)
 
+    offset = (pagina_atual - 1) * JOGOS_POR_PAGINA
+    token = gerar_token()
+
+    # ----------------------------
+    # 🔘 Filtros para botões
+    # ----------------------------
+    filtros = buscar_filtros_botoes(token)
+
+    # ----------------------------
+    # 🎮 Busca dos jogos na IGDB
+    # ----------------------------
+    jogos_brutos = buscar_catalogo_igdb(
+        token=token,
+        offset=offset,
+        termo_pesquisa=termo_pesquisa,
+        platform=platform_filter,
+        genre=genre_filter,
+        year=year_filter,
+        developer=developer_filter,
+        mode=mode_filter
+    )
+
+    # ----------------------------
+    # 🗂️ Processamento e filtros adicionais
+    # ----------------------------
     jogos_listagem = []
     for jogo in jogos_brutos:
+        # 🖼️ Capa
         cover_url_path = jogo.get("cover", {}).get("url")
-        
-        if not jogo.get("id"):
+        imagem_url = (
+            "https:" + cover_url_path.replace("t_thumb", "t_cover_big")
+            if cover_url_path
+            else "https://via.placeholder.com/300x400?text=Sem+Imagem"
+        )
+
+        # ----------------------------
+        # 🔧 Filtros extras de segurança
+        # ----------------------------
+        # Plataforma
+        if platform_filter and platform_filter not in ", ".join([p["name"] for p in jogo.get("platforms", [])]):
             continue
 
-        if cover_url_path:
-            # Substitui 't_thumb' por 't_cover_big' para melhor qualidade visual
-            imagem_url = "https:" + cover_url_path.replace("t_thumb", "t_cover_big")
-        else:
-            # URL de placeholder caso a capa não exista
-            imagem_url = "https://via.placeholder.com/300x400?text=Sem+Imagem" 
-        
+        # Gênero
+        if genre_filter and genre_filter not in ", ".join([g["name"] for g in jogo.get("genres", [])]):
+            continue
+
+        # Ano
+        if year_filter:
+            release_ts = jogo.get("first_release_date")
+            if not release_ts:
+                continue
+            ano_jogo = datetime.utcfromtimestamp(release_ts).year
+            if str(ano_jogo) != year_filter:
+                continue
+
+        # Desenvolvedora
+        if developer_filter:
+            developers_list = [c["company"]["name"] for c in jogo.get("involved_companies", []) if c.get("developer")]
+            if developer_filter not in ", ".join(developers_list):
+                continue
+
+        # Modo
+        if mode_filter and mode_filter not in ", ".join([m["name"] for m in jogo.get("game_modes", [])]):
+            continue
+
+        # ----------------------------
+        # 📌 Adiciona jogo à lista final
+        # ----------------------------
         jogos_listagem.append({
             "id": jogo.get("id"),
             "titulo": jogo.get("name", "Jogo Sem Nome"),
-            "imagem_url": imagem_url 
+            "imagem_url": imagem_url
         })
-        
-    proxima_pagina_existe = len(jogos_brutos) == JOGOS_POR_PAGINA 
-        
+
+    # ----------------------------
+    # 🔜 Paginação
+    # ----------------------------
+    proxima_pagina_existe = len(jogos_brutos) == JOGOS_POR_PAGINA
+
+    # ----------------------------
+    # 📤 Renderiza template
+    # ----------------------------
     return render_template(
-        'listagem.html', 
+        'listagem.html',
         jogos=jogos_listagem,
         pagina_atual=pagina_atual,
         proxima_pagina_existe=proxima_pagina_existe,
-        termo_pesquisa=termo_pesquisa 
+        termo_pesquisa=termo_pesquisa,
+        platform_filter=platform_filter,
+        genre_filter=genre_filter,
+        year_filter=year_filter,
+        developer_filter=developer_filter,
+        mode_filter=mode_filter,
+        filtros=filtros
     )
+
+
+
 
 @app.route('/dashboards/<int:game_id>')
 @login_required

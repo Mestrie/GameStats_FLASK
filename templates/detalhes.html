@@ -1,109 +1,134 @@
 {% extends "base.html" %}
 
-{% block title %}
-Detalhes - {{ detalhes.name or "Jogo Desconhecido" }}
-{% endblock %}
+{% block title %}Detalhes - {{ detalhes.name or "Jogo Desconhecido" }}{% endblock %}
 
 {% block content %}
 
-<h1>{{ detalhes.name }}</h1>
+<!-- TÍTULO DO JOGO -->
+<h1 class="mb-4">{{ detalhes.name }}</h1>
+<hr>
+
+<!-- NOTAS COM BARRAS SIMPLES -->
+<div class="d-flex flex-wrap gap-4 nota-container">
+
+    <!-- Nota IGDB -->
+    <div class="nota-card">
+        <h4>Nota IGDB</h4>
+        {% if detalhes.rating %}
+            <div class="nota-bar">
+                <div class="nota-bar-fill" style="--percent: {{ detalhes.rating |int }}%;"></div>
+            </div>
+            <div class="nota-valor">{{ "%.0f"|format(detalhes.rating) }}</div>
+        {% else %}
+            <p>Não disponível</p>
+        {% endif %}
+    </div>
+
+    <!-- Média dos usuários -->
+    <div class="nota-card">
+        <h4>Média dos Usuários</h4>
+        {% if media_usuarios %}
+            <div class="nota-bar">
+                <div class="nota-bar-fill" style="--percent: {{ media_usuarios|int }}%;"></div>
+            </div>
+            <div class="nota-valor">{{ "%.0f"|format(media_usuarios) }}</div>
+        {% else %}
+            <p>Ainda não avaliado</p>
+        {% endif %}
+    </div>
+
+    <!-- Imagem do jogo -->
+    <div class="nota-card">
+        {% if detalhes.image_url %}
+            <img src="{{ detalhes.image_url }}" alt="Capa do jogo" class="img-fluid rounded">
+        {% else %}
+            <p>Imagem não disponível</p>
+        {% endif %}
+    </div>
+
+</div>
 
 <hr>
 
-<!-- ========================= -->
-<!-- 📊 NOTAS -->
-<!-- ========================= -->
-
-<h2>Notas</h2>
-
-<p><strong>Nota IGDB:</strong>
-{% if detalhes.rating %}
-    {{ "%.1f"|format(detalhes.rating) }}/100
-{% else %}
-    Não disponível
-{% endif %}
-</p>
-
-<p><strong>Média dos usuários:</strong>
-{% if media_usuarios %}
-    {{ "%.1f"|format(media_usuarios) }}/100
-    <span style="color: #666;">
-        ({{ quantidade_usuarios }} usuário{{ 's' if quantidade_usuarios != 1 }})
-    </span>
-{% else %}
-    Ainda não avaliado
-{% endif %}
-</p>
-
-<hr>
-
-
-<!-- ========================= -->
-<!-- 🖼️ IMAGEM -->
-<!-- ========================= -->
-
-<img src="{{ detalhes.image_url }}" alt="Capa do jogo" width="300">
-
-<hr>
-
-<!-- ========================= -->
-<!-- 📖 RESUMO -->
-<!-- ========================= -->
-
+<!-- RESUMO -->
 <h2>Resumo</h2>
 <p>{{ detalhes.summary or "Sem descrição disponível." }}</p>
 
 <hr>
 
-<!-- ========================= -->
-<!-- ✍️ FORMULÁRIO DE REVIEW -->
-<!-- ========================= -->
+<!-- INFORMAÇÕES DO JOGO -->
+<h2>Informações</h2>
+<ul class="list-group mb-4">
+    <li class="list-group-item">
+        <strong>Data de Lançamento:</strong>
+        {{ detalhes.release_date.strftime("%d/%m/%Y") if detalhes.release_date else "Não disponível" }}
+    </li>
+    <li class="list-group-item">
+        <strong>Plataformas:</strong>
+        {% if detalhes.platforms %}
+            {% for platform in detalhes.platforms.split(', ') %}
+                {% set plat = platform.strip() %}
+                <a href="{{ url_for('listagem', platform=plat) }}" class="text-decoration-none">{{ plat }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        {% else %}Não disponível{% endif %}
+    </li>
+    <li class="list-group-item">
+        <strong>Gêneros:</strong>
+        {% if detalhes.genres %}
+            {% for genre in detalhes.genres.split(', ') %}
+                {% set g = genre.strip() %}
+                <a href="{{ url_for('listagem', genre=g) }}" class="text-decoration-none">{{ g }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        {% else %}Não disponível{% endif %}
+    </li>
+    <li class="list-group-item">
+        <strong>Modo:</strong>
+        {% if detalhes.game_modes %}
+            {% for mode in detalhes.game_modes.split(', ') %}
+                {% set m = mode.strip() %}
+                <a href="{{ url_for('listagem', mode=m) }}" class="text-decoration-none">{{ m }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        {% else %}Não disponível{% endif %}
+    </li>
+    <li class="list-group-item">
+        <strong>Desenvolvedoras:</strong>
+        {{ detalhes.developers or "Não disponível" }}
+    </li>
+</ul>
 
-<h2>Sua avaliação</h2>
+<hr>
 
-<form action="{{ url_for('salvar_review', game_id=game_id) }}" method="POST">
-
-    <label>Nota (0 a 100)</label><br>
-    <input
-        type="number"
-        name="rating"
-        min="0"
-        max="100"
-        required
-        value="{{ review_usuario.rating if review_usuario else '' }}"
-    ><br><br>
-
-    <label>Review</label><br>
-    <textarea
-        name="comment"
-        rows="4"
-        cols="50"
-        required
-    >{{ review_usuario.comment if review_usuario else '' }}</textarea><br><br>
-
-    <button type="submit">
+<!-- FORMULÁRIO DE REVIEW -->
+<h2>Sua Avaliação</h2>
+<form action="{{ url_for('salvar_review', game_id=game_id) }}" method="POST" class="mb-4">
+    <div class="mb-3">
+        <label for="rating" class="form-label">Nota (0 a 100)</label>
+        <input type="number" id="rating" name="rating" min="0" max="100" required
+               class="form-control" value="{{ review_usuario.rating if review_usuario else '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="comment" class="form-label">Review</label>
+        <textarea id="comment" name="comment" rows="4" required class="form-control">{{ review_usuario.comment if review_usuario else '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">
         {{ "Atualizar Review" if review_usuario else "Enviar Review" }}
     </button>
 </form>
 
-
 <hr>
 
-<!-- ========================= -->
-<!-- 🧾 REVIEWS DOS USUÁRIOS -->
-<!-- ========================= -->
-
+<!-- REVIEWS DOS USUÁRIOS -->
 <h2>Reviews dos usuários</h2>
-
 {% if reviews %}
     {% for review in reviews %}
-        <div>
-            <p><strong>{{ review.user.username }}</strong></p>
-            <p>Nota: {{ review.rating }}/100</p>
-            <p>{{ review.comment }}</p>
-            <small>{{ review.created_at.strftime("%d/%m/%Y") }}</small>
+        <div class="card mb-3 shadow-sm {% if review.user.id == current_user.id %}border-primary{% endif %}">
+            <div class="card-body">
+                <h5 class="card-title">{{ review.user.username }}</h5>
+                <p class="card-text"><strong>Nota:</strong> {{ review.rating }}</p>
+                <p class="card-text">{{ review.comment }}</p>
+                <small class="text-muted">{{ review.created_at.strftime("%d/%m/%Y") }}</small>
+            </div>
         </div>
-        <hr>
     {% endfor %}
 {% else %}
     <p>Nenhuma review ainda.</p>
@@ -111,24 +136,7 @@ Detalhes - {{ detalhes.name or "Jogo Desconhecido" }}
 
 <hr>
 
-<!-- ========================= -->
-<!-- 📺 DASHBOARD TWITCH -->
-<!-- ========================= -->
-
-<h2>Streams ativas na Twitch</h2>
-
-<div>
-    <canvas id="visualizadorChart"></canvas>
-</div>
-
-<div>
-    <canvas id="avaliacaoChart"></canvas>
-</div>
-
-<!-- ========================= -->
-<!-- 🔧 VARIÁVEIS PARA JS -->
-<!-- ========================= -->
-
+<!-- Variáveis JS -->
 <script>
     window.gameId = "{{ game_id }}";
     window.gameName = "{{ detalhes.name }}";

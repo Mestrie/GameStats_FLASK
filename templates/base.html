@@ -3,58 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ====================================================== -->
+    <!--  Bootstrap CSS                                        -->
+    <!-- ====================================================== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ====================================================== -->
+    <!--  Título e CSS personalizado                           -->
+    <!-- ====================================================== -->
     <title>{% block title %}Análise de Games - Twitch/IGDB{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- ====================================================== -->
+    <!--  Chart.js (para gráficos)                             -->
+    <!-- ====================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
+    <!-- ====================================================== -->
+    <!--  HEADER / NAVBAR                                      -->
+    <!-- ====================================================== -->
     <header>
-        <div class="container">
-            <a href="{{ url_for('index') }}" class="logo">🎮 Stream Insights</a>
-            
-            <nav>
-                <ul>
-                    <li><a href="{{ url_for('index') }}">Início</a></li>
-                    <li><a href="{{ url_for('listagem') }}">Catálogo de Jogos</a></li>
-                    
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('logout') }}">Sair</a></li>
-                        <li><span>Olá, {{ current_user.username }}</span></li>
-                    {% else %}
-                        <li><a href="{{ url_for('login') }}">Login</a></li>
-                        <li><a href="{{ url_for('cadastro') }}">Cadastro</a></li>
-                    {% endif %}
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
-                    {% endif %}
-                    <li>
-                        <button id="toggle-theme" class="tema-btn">🌙</button>
-                    </li>
-                </ul>
-                
-            </nav>
-        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--header-bg);">
+            <div class="container">
+                <!-- LOGO -->
+                <a class="navbar-brand" href="{{ url_for('index') }}">🎮 Stream Insights</a>
+
+                <!-- BOTÃO MOBILE -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- MENU -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+
+                        <!-- Links fixos -->
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Início</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('listagem') }}">Catálogo de Jogos</a></li>
+
+                        <!-- Links de usuário -->
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('perfil') }}">Perfil</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Sair</a></li>
+                            <li class="nav-item"><span class="nav-link disabled">Olá, {{ current_user.username }}</span></li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro') }}">Cadastro</a></li>
+                        {% endif %}
+
+                        <!-- Botão de tema -->
+                        <li class="nav-item">
+                            <button id="toggle-theme" class="btn btn-sm btn-outline-light">🌙</button>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
     </header>
 
+    <!-- ====================================================== -->
+    <!--  MAIN CONTENT                                        -->
+    <!-- ====================================================== -->
     <main>
-        <div class="container">
+        <div class="container py-4">
+
+            <!-- ----------------------------- -->
+            <!-- FLASH MESSAGES               -->
+            <!-- ----------------------------- -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
+                        <div class="alert alert-{{ 'success' if category=='success' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            
+
+            <!-- ----------------------------- -->
+            <!-- BLOCO PRINCIPAL DE CONTEÚDO  -->
+            <!-- ----------------------------- -->
             {% block content %}{% endblock %}
+
         </div>
     </main>
 
-    <footer>
+    <!-- ====================================================== -->
+    <!--  FOOTER                                              -->
+    <!-- ====================================================== -->
+    <footer class="py-3 text-center" style="background-color: var(--footer-bg); color: white;">
         <div class="container">
             <p>&copy; 2025 Stream Insights. Integrado com Twitch/IGDB APIs.</p>
         </div>
     </footer>
+
+    <!-- ====================================================== -->
+    <!--  JS PERSONALIZADO / BOOTSTRAP                        -->
+    <!-- ====================================================== -->
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

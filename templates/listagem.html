@@ -3,72 +3,145 @@
 {% block title %}Catálogo de Jogos (Página {{ pagina_atual }}){% endblock %}
 
 {% block content %}
-    <h1>Catálogo de Jogos (IGDB)</h1>
-    <p>Exibindo jogos de <strong>{{ pagina_atual }}</strong>. Clique em um jogo para ver sua análise.</p>
-    <!-- Formulário de Pesquisa -->
-    <div class="mb-8 p-4 bg-gray-50 rounded-lg shadow-md">
-        <form action="{{ url_for('listagem') }}" method="GET" id="search-form" class="flex flex-col sm:flex-row gap-4 items-center">
-            <label for="pesquisa" class="font-semibold text-lg text-gray-700 whitespace-nowrap">Pesquisar Jogo:</label>
+<!-- ========================= -->
+<!-- 🕹️ TÍTULO DA PÁGINA -->
+<!-- ========================= -->
+<h1 class="mb-3">Catálogo de Jogos (IGDB)</h1>
+<p class="mb-4">Exibindo jogos da página <strong>{{ pagina_atual }}</strong>. Clique em um jogo para ver sua análise.</p>
+
+<!-- ========================= -->
+<!-- 🔎 FORMULÁRIO DE PESQUISA -->
+<!-- ========================= -->
+<div class="mb-4 p-4 bg-light rounded-4 shadow-sm">
+    <form action="{{ url_for('listagem') }}" method="GET" id="search-form" class="row g-2 align-items-center">
+        <div class="col-sm-auto">
+            <label for="pesquisa" class="form-label fw-semibold">Pesquisar Jogo:</label>
+        </div>
+        <div class="col-sm">
             <input 
                 type="text" 
                 id="pesquisa" 
                 name="pesquisa" 
                 placeholder="Digite o nome do jogo..." 
                 value="{{ termo_pesquisa or '' }}" 
-                class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm w-full sm:w-auto"
+                class="form-control"
             >
-            <input type="hidden" name="pagina" value="1">
-            <button 
-                type="submit" 
-                class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-150 transform hover:scale-[1.01] w-full sm:w-auto"
-            >
-                Buscar
-            </button>
+        </div>
+        <input type="hidden" name="pagina" value="1">
+        <div class="col-sm-auto">
+            <button type="submit" class="btn btn-primary">Buscar</button>
             {% if termo_pesquisa %}
-                <a href="{{ url_for('listagem') }}" class="text-red-500 hover:text-red-700 font-medium whitespace-nowrap">Limpar Pesquisa</a>
+                <a href="{{ url_for('listagem') }}" class="btn btn-outline-danger">Limpar Pesquisa</a>
             {% endif %}
-        </form>
-    </div>
-<!-- Fim do Formulário de Pesquisa -->
- <script src="{{ url_for('static', filename='autocomplete.js') }}"></script>
+        </div>
+    </form>
+</div>
+<script src="{{ url_for('static', filename='autocomplete.js') }}"></script>
 
-<!-- Certifique-se de que a listagem de jogos (div grid) começa logo após este bloco -->
-    <div class="lista-jogos-grid">
-        {% for jogo in jogos %}
-        <div class="card-jogo">
+<!-- ========================= -->
+<!-- ⚙️ FILTROS AVANÇADOS -->
+<!-- ========================= -->
+<div class="mb-4 d-flex flex-wrap gap-2 align-items-center">
+
+    <!-- Plataforma -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            Plataforma
+        </button>
+        <ul class="dropdown-menu">
+            {% for plataforma in filtros.platforms %}
+                <li><a class="dropdown-item" href="{{ url_for('listagem', platform=plataforma) }}">{{ plataforma }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Gênero -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            Gênero
+        </button>
+        <ul class="dropdown-menu">
+            {% for genero in filtros.genres %}
+                <li><a class="dropdown-item" href="{{ url_for('listagem', genre=genero) }}">{{ genero }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Modo -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            Modo
+        </button>
+        <ul class="dropdown-menu">
+            {% for modo in filtros.modes %}
+                <li><a class="dropdown-item" href="{{ url_for('listagem', mode=modo) }}">{{ modo }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Limpar Filtros -->
+    {% if platform_filter or genre_filter or mode_filter %}
+        <a href="{{ url_for('listagem') }}" class="btn btn-outline-danger ms-2">
+            Limpar filtros ✕
+        </a>
+    {% endif %}
+</div>
+<script src="{{ url_for('static', filename='filtros.js') }}"></script>
+
+<!-- ========================= -->
+<!-- 🎴 GRID DE JOGOS -->
+<!-- ========================= -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    {% for jogo in jogos %}
+    <div class="col">
+        <div class="card card-jogo h-100 shadow-sm">
             <a href="{{ url_for('dashboards_detalhes', game_id=jogo.id) }}">
-                <img src="{{ jogo.imagem_url }}" alt="Capa do Jogo {{ jogo.titulo }}">
-                <div class="info-jogo">
-                    <h3>{{ jogo.titulo }}</h3>
+                <img src="{{ jogo.imagem_url }}" class="card-img-top" alt="Capa do Jogo {{ jogo.titulo }}">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">{{ jogo.titulo }}</h5>
                 </div>
             </a>
         </div>
-        {% endfor %}
     </div>
+    {% endfor %}
+</div>
 
-    <!-- Controles de Paginação -->
-    <div class="flex justify-center items-center mt-10 space-x-6">
+<!-- ========================= -->
+<!-- ⬅️➡️ PAGINAÇÃO -->
+<!-- ========================= -->
+<nav aria-label="Navegação de página" class="mt-5">
+    <ul class="pagination justify-content-center custom-pagination">
+        
         {% if pagina_atual > 1 %}
-            <a href="{{ url_for('listagem', pagina=pagina_atual - 1, pesquisa=termo_pesquisa) }}" class="px-6 py-3 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 transition duration-150">
-                <span class="text-xl">&larr;</span> Página Anterior
-            </a>
+            <li class="page-item">
+                <a class="page-link shadow-sm" href="{{ url_for('listagem', pagina=pagina_atual - 1, pesquisa=termo_pesquisa) }}">
+                    <i class="bi bi-chevron-left"></i> Anterior
+                </a>
+            </li>
         {% else %}
-            <span class="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
-                <span class="text-xl">&larr;</span> Página Anterior
-            </span>
+            <li class="page-item disabled">
+                <span class="page-link shadow-none">&laquo; Anterior</span>
+            </li>
         {% endif %}
 
-        <span class="text-xl font-bold text-blue-600">Página {{ pagina_atual }}</span>
+        <li class="page-item active">
+            <span class="page-link px-4 shadow">
+                {{ pagina_atual }}
+            </span>
+        </li>
 
         {% if proxima_pagina_existe %}
-            <a href="{{ url_for('listagem', pagina=pagina_atual + 1, pesquisa=termo_pesquisa) }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150">
-                Próxima Página <span class="text-xl">&rarr;</span>
-            </a>
+            <li class="page-item">
+                <a class="page-link shadow-sm" href="{{ url_for('listagem', pagina=pagina_atual + 1, pesquisa=termo_pesquisa) }}">
+                    Próxima <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
         {% else %}
-            <span class="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
-                Próxima Página <span class="text-xl">&rarr;</span>
-            </span>
+            <li class="page-item disabled">
+                <span class="page-link shadow-none">Próxima &raquo;</span>
+            </li>
         {% endif %}
-    </div>
-    <!-- Fim dos Controles de Paginação -->
-    {% endblock %}
+        
+    </ul>
+</nav>
+{% endblock %}
