@@ -15,6 +15,8 @@ from python.models import User, Game, Review
 from sqlalchemy import func
 from flask import abort
 from datetime import datetime
+from python.utilidades import cadastrar_usuario
+
 
 
 
@@ -113,30 +115,37 @@ def login():
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
-    """Página de Cadastro (Lógica REAL com DB)."""
+    # Evita acesso à página de cadastro por usuários autenticados
     if current_user.is_authenticated:
-        flash('Você já está logado!', 'info')
-        return redirect(url_for('listagem'))  # Se estiver logado, redireciona para a listagem.
+        flash('Você já está logado.', 'info')
+        return redirect(url_for('listagem'))
 
     if request.method == 'POST':
+        # Dados do formulário
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
-        
-        if User.query.filter_by(email=email).first():
-            flash('Este e-mail já está cadastrado. Tente fazer login.', 'danger')
-            return render_template('cadastro.html')
 
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        
-        novo_usuario = User(email=email, username=username, password=hashed_password)
-        db.session.add(novo_usuario)
-        db.session.commit()
-        
-        flash(f'Conta criada com sucesso para {username}! Faça login.', 'success')
-        return redirect(url_for('login'))
-        
+        # Geração do hash da senha
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        # Criação do usuário (valida duplicidade e trata erro de integridade)
+        sucesso, mensagem = cadastrar_usuario(
+            email=email,
+            username=username,
+            password_hash=password_hash
+        )
+
+        # Feedback ao usuário
+        flash(mensagem, 'success' if sucesso else 'danger')
+
+        # Redirecionamento pós-cadastro
+        if sucesso:
+            return redirect(url_for('login'))
+
+    # Renderização inicial ou em caso de erro
     return render_template('cadastro.html')
+
 
 '''
 @app.route('/logout')
@@ -150,20 +159,29 @@ def logout():
 @login_required
 def alterar_senha():
     if request.method == "POST":
+        # Obtém a senha atual e a nova senha do formulário
         atual = request.form["senha_atual"]
         nova = request.form["nova_senha"]
 
-        if not check_password_hash(current_user.password, atual):
+        # Verifica se a senha atual corresponde ao hash armazenado (Flask-Bcrypt)
+        if not bcrypt.check_password_hash(current_user.password, atual):
+            # Exibe mensagem de erro caso a senha atual esteja incorreta
             flash("Senha atual incorreta.", "danger")
             return redirect(url_for("alterar_senha"))
 
-        current_user.password = generate_password_hash(nova)
+        # Gera o hash da nova senha e armazena no objeto do usuário
+        current_user.password = bcrypt.generate_password_hash(nova).decode("utf-8")
+        # Salva alterações no banco de dados
         db.session.commit()
 
+        # Exibe mensagem de sucesso e redireciona para o perfil
         flash("Senha atualizada com sucesso!", "success")
         return redirect(url_for("perfil"))
 
+    # Renderiza a página de alteração de senha
     return render_template("alterar_senha.html")
+
+
 
 @app.route('/esqueci_senha', methods=['GET', 'POST'])
 def esqueci_senha():

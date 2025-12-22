@@ -3,6 +3,8 @@ import time
 import random 
 import os 
 from dotenv import load_dotenv 
+from sqlalchemy.exc import IntegrityError
+from python.models import User
 from python.models import Game
 from python.extensions import db
 from datetime import datetime, timedelta
@@ -424,6 +426,39 @@ def realizar_analise_dashboards(game_id, game_name):
         "titulo": f"Streams Ativas de: {game_name}"
     }
     return dados_analise
+
+# ============================================
+# 👤 FUNÇÕES DE USUÁRIO (Cadastro / Validação)
+# ============================================
+
+def cadastrar_usuario(email, username, password_hash):
+    """
+    Cria um novo usuário no banco.
+    Retorna (True, mensagem) ou (False, mensagem)
+    """
+
+    # 🔍 Verifica duplicidade
+    usuario_existente = User.query.filter(
+        (User.email == email) | (User.username == username)
+    ).first()
+
+    if usuario_existente:
+        return False, "E-mail ou nome de usuário já cadastrado."
+
+    novo_usuario = User(
+        email=email,
+        username=username,
+        password=password_hash
+    )
+
+    try:
+        db.session.add(novo_usuario)
+        db.session.commit()
+        return True, "Conta criada com sucesso!"
+    except IntegrityError:
+        db.session.rollback()
+        return False, "Erro ao criar conta. Dados duplicados."
+
 
 # ============================================
 # 🔄 Função “get or fetch” (cache inteligente)
